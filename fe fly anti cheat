@@ -1,60 +1,53 @@
--- Simplified CFrame Fly (CFly) Functionality
 local localPlayer = game:GetService("Players").LocalPlayer
 local isFlyActive = false
-local flySpeed = 1
+local flySpeed = 100  -- Set default fly speed to 100
 local camera = workspace.CurrentCamera
-local humanoid = nil
 
--- CFrame Fly Toggle and Keybind
-local UserInputService = game:GetService("UserInputService")
+-- Movement logic for CFly
+local uis = game:GetService("UserInputService")
 
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.G then  -- Toggle fly on/off with "G"
-        isFlyActive = not isFlyActive
+-- Function to handle G key press for flying toggle
+uis.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end -- Ignore if the game has processed the input (e.g., UI buttons)
+
+    if input.KeyCode == Enum.KeyCode.G then
+        isFlyActive = not isFlyActive  -- Toggle flying state on G press
+        print("Flying state: ", isFlyActive)  -- Debugging output
     end
 end)
 
--- CFrame Fly Speed Slider (default speed set to 1)
-local function setFlySpeed(value)
-    flySpeed = value
-end
-
-setFlySpeed(1)  -- Default fly speed is 1
-
--- Movement logic for CFly
-local function handleFlyMovement()
+while true do
+    task.wait()
     if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
         local hrp = localPlayer.Character.HumanoidRootPart
-
+        
         -- Fly functionality (CFrame-based movement)
         if isFlyActive then
             local currentPos = hrp.Position
-            local lookAtPos = currentPos + camera.CFrame.LookVector * 100
-            hrp.CFrame = CFrame.new(currentPos, lookAtPos)
+            local lookAtPos = currentPos + camera.CFrame.LookVector * 10 -- Adjust multiplier for smoother movement
+            hrp.CFrame = CFrame.new(currentPos, lookAtPos) -- Align character to camera's look vector
+
             local flyDirection = Vector3.zero
-            if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+
+            -- Check movement inputs (W, A, S, D)
+            if uis:IsKeyDown(Enum.KeyCode.W) then
                 flyDirection += camera.CFrame.LookVector
             end
-            if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+            if uis:IsKeyDown(Enum.KeyCode.S) then
                 flyDirection -= camera.CFrame.LookVector
             end
-            if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+            if uis:IsKeyDown(Enum.KeyCode.A) then
                 flyDirection -= camera.CFrame.RightVector
             end
-            if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+            if uis:IsKeyDown(Enum.KeyCode.D) then
                 flyDirection += camera.CFrame.RightVector
             end
 
+            -- Normalize and apply movement
             if flyDirection.Magnitude > 0 then
                 flyDirection = flyDirection.Unit
             end
             hrp.Velocity = flyDirection * flySpeed
         end
     end
-end
-
-while true do
-    task.wait(0.1)  -- Small delay for efficient loop
-    handleFlyMovement()
 end
