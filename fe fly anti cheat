@@ -10,7 +10,7 @@ local UserInputService = game:GetService("UserInputService")
 
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.F then  -- Toggle fly on/off with "F"
+    if input.KeyCode == Enum.KeyCode.G then  -- Toggle fly on/off with "G"
         isFlyActive = not isFlyActive
     end
 end)
